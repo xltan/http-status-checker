@@ -1,0 +1,10 @@
+[package]
+name = "http-status-checker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+http_req = "^0.13"
+
+[profile.release]
+strip = "debuginfo"

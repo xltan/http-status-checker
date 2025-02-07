@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Windows
+        if: matrix.os == 'windows-latest'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          target: x86_64-pc-windows-msvc
+
+      - name: Set up Rust macOS
+        if: matrix.os == 'macos-latest'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          target: x86_64-apple-darwin
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.os == 'windows-latest' && 'x86_64-pc-windows-msvc' || 'x86_64-apple-darwin' }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            target/x86_64-pc-windows-msvc/release/http-status-checker.exe
+            target/x86_64-apple-darwin/release/http-status-checker

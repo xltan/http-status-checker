@@ -43,6 +43,7 @@ jobs:
             mv target/${{ matrix.target }}/release/http-status-checker.exe target/${{ matrix.target }}/release/http-status-checker-${{ matrix.suffix }}.exe
           else
             mv target/${{ matrix.target }}/release/http-status-checker target/${{ matrix.target }}/release/http-status-checker-${{ matrix.suffix }}
+          fi
 
       - name: Release
         uses: softprops/action-gh-release@v2

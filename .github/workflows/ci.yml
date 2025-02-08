@@ -39,6 +39,7 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Rename executable
+        shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             mv target/${{ matrix.target }}/release/http-status-checker.exe target/${{ matrix.target }}/release/http-status-checker-${{ matrix.suffix }}.exe

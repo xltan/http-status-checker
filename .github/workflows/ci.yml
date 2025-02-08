@@ -11,22 +11,19 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest]
-        target:
-          [
-            x86_64-pc-windows-msvc,
-            i686-pc-windows-msvc,
-            x86_64-apple-darwin,
-            aarch64-apple-darwin,
-          ]
         include:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+            suffix: x86_64
           - os: windows-latest
             target: i686-pc-windows-msvc
+            suffix: ia32
           - os: macos-latest
             target: x86_64-apple-darwin
+            suffix: x86_64
           - os: macos-latest
             target: aarch64-apple-darwin
+            suffix: arm64
 
     steps:
       - name: Checkout code
@@ -43,13 +40,13 @@ jobs:
       - name: Rename executable
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            mv target/${{ matrix.target }}/release/http-status-checker.exe target/${{ matrix.target }}/release/http-status-checker-${{ matrix.target }}.exe
+            mv target/${{ matrix.target }}/release/http-status-checker.exe target/${{ matrix.target }}/release/http-status-checker-${{ matrix.suffix }}.exe
           else
-            mv target/${{ matrix.target }}/release/http-status-checker target/${{ matrix.target }}/release/http-status-checker-${{ matrix.target }}
+            mv target/${{ matrix.target }}/release/http-status-checker target/${{ matrix.target }}/release/http-status-checker-${{ matrix.suffix }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/${{ matrix.target }}/release/http-status-checker-${{ matrix.target }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+            target/${{ matrix.target }}/release/http-status-checker-${{ matrix.suffix }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}

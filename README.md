@@ -1,4 +1,4 @@
-# Rust CLI Application
+# HTTP Status Checker
 
 This is a simple command-line interface (CLI) application written in Rust that accepts a URL as input and returns the HTTP status code of the response.
 

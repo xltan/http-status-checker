@@ -11,30 +11,45 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest]
+        target:
+          [
+            x86_64-pc-windows-msvc,
+            i686-pc-windows-msvc,
+            x86_64-apple-darwin,
+            aarch64-apple-darwin,
+          ]
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Rust Windows
-        if: matrix.os == 'windows-latest'
+      - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          target: x86_64-pc-windows-msvc
-
-      - name: Set up Rust macOS
-        if: matrix.os == 'macos-latest'
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          target: x86_64-apple-darwin
+          target: ${{ matrix.target }}
 
       - name: Build
-        run: cargo build --release --target ${{ matrix.os == 'windows-latest' && 'x86_64-pc-windows-msvc' || 'x86_64-apple-darwin' }}
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Rename executable
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            mv target/${{ matrix.target }}/release/http-status-checker.exe target/${{ matrix.target }}/release/http-status-checker-${{ matrix.target }}.exe
+          else
+            mv target/${{ matrix.target }}/release/http-status-checker target/${{ matrix.target }}/release/http-status-checker-${{ matrix.target }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/x86_64-pc-windows-msvc/release/http-status-checker.exe
-            target/x86_64-apple-darwin/release/http-status-checker
+            target/${{ matrix.target }}/release/http-status-checker-${{ matrix.target }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}

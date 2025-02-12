@@ -19,7 +19,7 @@ fn main() {
     };
 
     let mut body = Vec::new();
-    let timeout = Duration::from_millis(1500);
+    let timeout = Duration::from_millis(2000);
 
     // Create a request with a timeout
     let mut request = request::Request::new(&uri);
